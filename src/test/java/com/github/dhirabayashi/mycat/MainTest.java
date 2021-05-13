@@ -21,4 +21,15 @@ class MainTest {
         // run
         assertEquals(expected, Main.cat(file));
     }
+
+    @Test
+    void cat_multiLine(@TempDir Path tempDir) throws IOException {
+        // setup
+        var file = tempDir.resolve("test.txt");
+        var expected = "aaa\nbbb";
+        Files.writeString(file, expected);
+
+        // run
+        assertEquals(expected, Main.cat(file));
+    }
 }
