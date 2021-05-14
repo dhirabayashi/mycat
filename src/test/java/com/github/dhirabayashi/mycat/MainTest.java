@@ -19,7 +19,7 @@ class MainTest {
         Files.writeString(file, expected);
 
         // run
-        assertEquals(expected, Main.cat(file));
+        assertEquals(expected, Main.cat(file, false));
     }
 
     @Test
@@ -30,6 +30,18 @@ class MainTest {
         Files.writeString(file, expected);
 
         // run
-        assertEquals(expected, Main.cat(file));
+        assertEquals(expected, Main.cat(file, false));
+    }
+
+    @Test
+    void cat_numberLines(@TempDir Path tempDir) throws IOException {
+        // setup
+        var file = tempDir.resolve("test.txt");
+        Files.writeString(file, "aaa\n\nbbb");
+
+        var expected = "1 aaa\n2 \n3 bbb";
+
+        // run
+        assertEquals(expected, Main.cat(file, true));
     }
 }

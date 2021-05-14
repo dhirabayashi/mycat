@@ -2,11 +2,13 @@ package com.github.dhirabayashi.mycat;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.github.dhirabayashi.mycat.util.Counter;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -22,13 +24,17 @@ public class Main {
                 System.err.println("mycat: " + file + ": No such file or directory");
                 continue;
             }
-            System.out.println(cat(file));
+            System.out.println(cat(file, argument.n));
         }
     }
 
-    static String cat(Path path) throws IOException {
-        var lines = Files.readAllLines(path);
-        return String.join("\n", lines);
+    static String cat(Path path, boolean numberLines) throws IOException {
+        try(var lines = Files.lines(path)) {
+            var counter = new Counter(0);
+            return lines.peek(line -> counter.increment())
+                    .map(line -> numberLines ? counter.intValue() + " " + line : line)
+                    .collect(Collectors.joining("\n"));
+        }
     }
 
     public static class Argument {
