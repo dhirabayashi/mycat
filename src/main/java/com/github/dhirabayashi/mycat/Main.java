@@ -24,15 +24,26 @@ public class Main {
                 System.err.println("mycat: " + file + ": No such file or directory");
                 continue;
             }
-            System.out.println(cat(file, argument.n));
+            System.out.println(cat(file, argument.n, argument.b));
         }
     }
 
-    static String cat(Path path, boolean numberLines) throws IOException {
+    static String cat(Path path, boolean numberLines, boolean numberNonBlankLine) throws IOException {
         try(var lines = Files.lines(path)) {
             var counter = new Counter(0);
-            return lines.peek(line -> counter.increment())
-                    .map(line -> numberLines ? counter.intValue() + " " + line : line)
+            return lines.map(line -> {
+                        if(numberLines) {
+                            counter.increment();
+                            return counter.intValue() + " " + line;
+                        }
+
+                        if(numberNonBlankLine && !line.isEmpty()) {
+                            counter.increment();
+                            return counter.intValue() + " " + line;
+                        }
+
+                        return line;
+                    })
                     .collect(Collectors.joining("\n"));
         }
     }
@@ -43,5 +54,8 @@ public class Main {
 
         @Parameter(names = "-n", description = "Number the output lines, starting at 1.")
         private boolean n;
+
+        @Parameter(names = "-b", description = "Number the non-blank output lines, starting at 1.")
+        private boolean b;
     }
 }
