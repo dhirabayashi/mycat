@@ -1,5 +1,8 @@
 package com.github.dhirabayashi.mycat.util;
 
+/**
+ * ラムダ式から参照できるカウンター
+ */
 public class Counter {
     private int n;
 

@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static com.github.dhirabayashi.mycat.Options.NUMBER_LINES;
+import static com.github.dhirabayashi.mycat.Options.NUMBER_NON_BLANK_LINES;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MainTest {
 
@@ -19,7 +21,7 @@ class MainTest {
         Files.writeString(file, expected);
 
         // run
-        assertEquals(expected, Main.cat(file, false, false));
+        assertEquals(expected, Main.cat(file));
     }
 
     @Test
@@ -30,7 +32,7 @@ class MainTest {
         Files.writeString(file, expected);
 
         // run
-        assertEquals(expected, Main.cat(file, false, false));
+        assertEquals(expected, Main.cat(file));
     }
 
     @Test
@@ -42,7 +44,7 @@ class MainTest {
         var expected = "1 aaa\n2 \n3 bbb";
 
         // run
-        assertEquals(expected, Main.cat(file, true, false));
+        assertEquals(expected, Main.cat(file, NUMBER_LINES));
     }
 
     @Test
@@ -54,6 +56,6 @@ class MainTest {
         var expected = "1 aaa\n\n2 bbb";
 
         // run
-        assertEquals(expected, Main.cat(file, false, true));
+        assertEquals(expected, Main.cat(file, NUMBER_NON_BLANK_LINES));
     }
 }
