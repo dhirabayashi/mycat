@@ -29,6 +29,9 @@ public class Main {
         if(argument.b) {
             options.add(Options.NUMBER_NON_BLANK_LINES);
         }
+        if(argument.s) {
+            options.add(Options.SQUEEZE_EMPTY_LINES);
+        }
 
         // 実行
         for(var arg : argument.files) {
@@ -46,8 +49,24 @@ public class Main {
                 .collect(Collectors.toSet());
 
         try(var lines = Files.lines(path)) {
+            List<String> tmpList = lines.collect(Collectors.toList());
+            List<String> list = new ArrayList<>();
+
+            if(optionsSet.contains(Options.SQUEEZE_EMPTY_LINES)) {
+                for(int i = 0; i < tmpList.size(); i++) {
+                    var line = tmpList.get(i);
+                    if(line.isEmpty() && i != (tmpList.size() - 1) && tmpList.get(i + 1).isEmpty()) {
+                        continue;
+                    }
+                    list.add(line);
+                }
+            } else {
+                list = tmpList;
+            }
+
             var counter = new Counter(0);
-            return lines.map(line -> {
+            return list.stream()
+                    .map(line -> {
                         if(optionsSet.contains(Options.NUMBER_LINES)) {
                             counter.increment();
                             return counter.intValue() + " " + line;
@@ -73,6 +92,9 @@ public class Main {
 
         @Parameter(names = "-b", description = "Number the non-blank output lines, starting at 1.")
         private boolean b;
+
+        @Parameter(names = "-s", description = "Squeeze multiple adjacent empty lines, causing the output to be single spaced.")
+        private boolean s;
     }
 }
 enum Options {
@@ -83,5 +105,10 @@ enum Options {
     /**
      * 空行以外に行番号をつける
      */
-    NUMBER_NON_BLANK_LINES
+    NUMBER_NON_BLANK_LINES,
+
+    /**
+     * 連続する空行を一行にする
+     */
+    SQUEEZE_EMPTY_LINES,
 }

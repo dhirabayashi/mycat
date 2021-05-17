@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.github.dhirabayashi.mycat.Options.NUMBER_LINES;
-import static com.github.dhirabayashi.mycat.Options.NUMBER_NON_BLANK_LINES;
+import static com.github.dhirabayashi.mycat.Options.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MainTest {
@@ -57,5 +56,41 @@ class MainTest {
 
         // run
         assertEquals(expected, Main.cat(file, NUMBER_NON_BLANK_LINES));
+    }
+
+    @Test
+    void cat_squeeze(@TempDir Path tempDir) throws IOException {
+        // setup
+        var file = tempDir.resolve("test.txt");
+        Files.writeString(file, "aaa\n\n\n\n\n\nbbb");
+
+        var expected = "aaa\n\nbbb";
+
+        // run
+        assertEquals(expected, Main.cat(file, SQUEEZE_EMPTY_LINES));
+    }
+
+    @Test
+    void cat_squeeze_noEmptyLines(@TempDir Path tempDir) throws IOException {
+        // setup
+        var file = tempDir.resolve("test.txt");
+        Files.writeString(file, "aaa\nbbb");
+
+        var expected = "aaa\nbbb";
+
+        // run
+        assertEquals(expected, Main.cat(file, SQUEEZE_EMPTY_LINES));
+    }
+
+    @Test
+    void cat_squeeze_numberLines(@TempDir Path tempDir) throws IOException {
+        // setup
+        var file = tempDir.resolve("test.txt");
+        Files.writeString(file, "aaa\n\n\n\n\nbbb");
+
+        var expected = "1 aaa\n2 \n3 bbb";
+
+        // run
+        assertEquals(expected, Main.cat(file, SQUEEZE_EMPTY_LINES, NUMBER_LINES));
     }
 }
