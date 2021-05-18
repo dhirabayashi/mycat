@@ -7,12 +7,47 @@ import com.github.dhirabayashi.mycat.util.Counter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
+    private static final Map<Integer, String> nonPrintingTable = new HashMap<>();
+
+    static {
+        nonPrintingTable.put(0x00, "^@");
+        nonPrintingTable.put(0x01, "^A");
+        nonPrintingTable.put(0x02, "^B");
+        nonPrintingTable.put(0x03, "^C");
+        nonPrintingTable.put(0x04, "^D");
+        nonPrintingTable.put(0x05, "^E");
+        nonPrintingTable.put(0x06, "^F");
+        nonPrintingTable.put(0x07, "^G");
+        nonPrintingTable.put(0x08, "^H");
+        nonPrintingTable.put(0x09, "^I");
+        nonPrintingTable.put(0x0A, "^J");
+        nonPrintingTable.put(0x0B, "^K");
+        nonPrintingTable.put(0x0C, "^L");
+        nonPrintingTable.put(0x0D, "^M");
+        nonPrintingTable.put(0x0E, "^N");
+        nonPrintingTable.put(0x0F, "^O");
+        nonPrintingTable.put(0x10, "^P");
+        nonPrintingTable.put(0x11, "^Q");
+        nonPrintingTable.put(0x12, "^R");
+        nonPrintingTable.put(0x13, "^S");
+        nonPrintingTable.put(0x14, "^T");
+        nonPrintingTable.put(0x15, "^U");
+        nonPrintingTable.put(0x16, "^V");
+        nonPrintingTable.put(0x17, "^W");
+        nonPrintingTable.put(0x18, "^X");
+        nonPrintingTable.put(0x19, "^Y");
+        nonPrintingTable.put(0x1A, "^Z");
+        nonPrintingTable.put(0x1B, "^[");
+        nonPrintingTable.put(0x1C, "^\\");
+        nonPrintingTable.put(0x1D, "^]");
+        nonPrintingTable.put(0x1E, "^^");
+        nonPrintingTable.put(0x1F, "^_");
+    }
+
     public static void main(String[] args) throws IOException {
         // コマンドのパース
         var argument = new Argument();
@@ -95,6 +130,9 @@ public class Main {
 
         @Parameter(names = "-s", description = "Squeeze multiple adjacent empty lines, causing the output to be single spaced.")
         private boolean s;
+
+        @Parameter(names = "-v", description = "Display non-printing characters so they are visible.")
+        private boolean v;
     }
 }
 enum Options {
@@ -111,4 +149,9 @@ enum Options {
      * 連続する空行を一行にする
      */
     SQUEEZE_EMPTY_LINES,
+
+    /**
+     * 非表示文字を表示する
+     */
+    DISPLAY_NON_PRINTING_CHARACTERS,
 }
