@@ -93,4 +93,16 @@ class MainTest {
         // run
         assertEquals(expected, Main.cat(file, SQUEEZE_EMPTY_LINES, NUMBER_LINES));
     }
+
+    @Test
+    void cat_displayNonPrintingChar(@TempDir Path tempDir) throws IOException {
+        // setup
+        var file = tempDir.resolve("test.txt");
+        Files.writeString(file, "aaa" + (char) 0x00);
+
+        var expected = "aaa^@";
+
+        // run
+        assertEquals(expected, Main.cat(file, DISPLAY_NON_PRINTING_CHARACTERS));
+    }
 }

@@ -67,6 +67,9 @@ public class Main {
         if(argument.s) {
             options.add(Options.SQUEEZE_EMPTY_LINES);
         }
+        if(argument.v) {
+            options.add(Options.DISPLAY_NON_PRINTING_CHARACTERS);
+        }
 
         // 実行
         for(var arg : argument.files) {
@@ -102,6 +105,12 @@ public class Main {
             var counter = new Counter(0);
             return list.stream()
                     .map(line -> {
+                        if(optionsSet.contains(Options.DISPLAY_NON_PRINTING_CHARACTERS)) {
+                            line = line.codePoints()
+                                    .mapToObj(i -> nonPrintingTable.getOrDefault(i, Character.toString((char)i)))
+                                    .collect(Collectors.joining());
+                        }
+
                         if(optionsSet.contains(Options.NUMBER_LINES)) {
                             counter.increment();
                             return counter.intValue() + " " + line;
