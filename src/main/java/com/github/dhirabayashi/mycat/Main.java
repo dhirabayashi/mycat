@@ -79,6 +79,10 @@ public class Main {
                 continue;
             }
             System.out.println(cat(file, options.toArray(Options[]::new)));
+            // バッファリングの無効化（やり方がわからないのでとりあえずフラッシュしておくｗ）
+            if(argument.u) {
+                System.out.flush();
+            }
         }
     }
 
@@ -142,6 +146,9 @@ public class Main {
 
         @Parameter(names = "-v", description = "Display non-printing characters so they are visible.")
         private boolean v;
+
+        @Parameter(names = "-u", description = "Disable output buffering.")
+        private boolean u;
     }
 }
 enum Options {
