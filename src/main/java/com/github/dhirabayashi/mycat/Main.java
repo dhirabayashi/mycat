@@ -5,6 +5,7 @@ import com.beust.jcommander.Parameter;
 import com.github.dhirabayashi.mycat.util.Counter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -110,8 +111,22 @@ public class Main {
             return list.stream()
                     .map(line -> {
                         if(optionsSet.contains(Options.DISPLAY_NON_PRINTING_CHARACTERS)) {
-                            line = line.codePoints()
-                                    .mapToObj(i -> nonPrintingTable.getOrDefault(i, Character.toString((char)i)))
+                            // Arrays.stream()にbyte[]を引数に取るものがないので、int[]に詰め替える
+                            var tmpBytes = line.getBytes(StandardCharsets.UTF_8);
+                            int[] bytes = new int[tmpBytes.length];
+                            for(int i = 0; i < bytes.length; i++) {
+                                bytes[i] = tmpBytes[i];
+                            }
+
+                            line = Arrays.stream(bytes)
+                                    .mapToObj(i -> {
+                                        // マルチバイト文字
+                                        if(i < 0) {
+                                            return "M-^" + (char)(i + 192);
+                                        }
+                                        // それ以外
+                                        return nonPrintingTable.getOrDefault(i, Character.toString((char)i));
+                                    })
                                     .collect(Collectors.joining());
                         }
 

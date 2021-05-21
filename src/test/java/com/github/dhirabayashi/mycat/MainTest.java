@@ -105,4 +105,16 @@ class MainTest {
         // run
         assertEquals(expected, Main.cat(file, DISPLAY_NON_PRINTING_CHARACTERS));
     }
+
+    @Test
+    void cat_displayNonPrintingChar_multiBytes(@TempDir Path tempDir) throws IOException {
+        // setup
+        var file = tempDir.resolve("test.txt");
+        Files.writeString(file, "あ");
+
+        var expected = "M-^£M-^AM-^B";
+
+        // run
+        assertEquals(expected, Main.cat(file, DISPLAY_NON_PRINTING_CHARACTERS));
+    }
 }
