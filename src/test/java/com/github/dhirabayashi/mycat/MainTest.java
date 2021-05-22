@@ -98,9 +98,9 @@ class MainTest {
     void cat_displayNonPrintingChar(@TempDir Path tempDir) throws IOException {
         // setup
         var file = tempDir.resolve("test.txt");
-        Files.writeString(file, "aaa" + (char) 0x00);
+        Files.writeString(file, "aaa\t" + (char) 0x00);
 
-        var expected = "aaa^@";
+        var expected = "aaa\t^@";
 
         // run
         assertEquals(expected, Main.cat(file, DISPLAY_NON_PRINTING_CHARACTERS));

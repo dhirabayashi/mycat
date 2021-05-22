@@ -24,8 +24,8 @@ public class Main {
         nonPrintingTable.put(0x06, "^F");
         nonPrintingTable.put(0x07, "^G");
         nonPrintingTable.put(0x08, "^H");
-        nonPrintingTable.put(0x09, "^I");
-        nonPrintingTable.put(0x0A, "^J");
+        //nonPrintingTable.put(0x09, "^I");
+        //nonPrintingTable.put(0x0A, "^J");
         nonPrintingTable.put(0x0B, "^K");
         nonPrintingTable.put(0x0C, "^L");
         nonPrintingTable.put(0x0D, "^M");
@@ -47,6 +47,7 @@ public class Main {
         nonPrintingTable.put(0x1D, "^]");
         nonPrintingTable.put(0x1E, "^^");
         nonPrintingTable.put(0x1F, "^_");
+        nonPrintingTable.put(0x7F, "^?");
     }
 
     public static void main(String[] args) throws IOException {
@@ -72,11 +73,15 @@ public class Main {
             options.add(Options.DISPLAY_NON_PRINTING_CHARACTERS);
         }
 
+        // 終了コード
+        int exitCode = 0;
+
         // 実行
         for(var arg : argument.files) {
             var file = Path.of(arg);
             if(!Files.exists(file)) {
                 System.err.println("mycat: " + file + ": No such file or directory");
+                exitCode = 1;
                 continue;
             }
             System.out.println(cat(file, options.toArray(Options[]::new)));
@@ -85,6 +90,7 @@ public class Main {
                 System.out.flush();
             }
         }
+        System.exit(exitCode);
     }
 
     static String cat(Path path, Options... options) throws IOException {
