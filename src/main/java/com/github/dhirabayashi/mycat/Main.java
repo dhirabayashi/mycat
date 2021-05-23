@@ -72,6 +72,10 @@ public class Main {
         if(argument.v) {
             options.add(Options.DISPLAY_NON_PRINTING_CHARACTERS);
         }
+        if(argument.t) {
+            options.add(Options.DISPLAY_NON_PRINTING_CHARACTERS);
+            options.add(Options.DISPLAY_NON_PRINTING_AND_TAB);
+        }
 
         // 終了コード
         int exitCode = 0;
@@ -130,6 +134,13 @@ public class Main {
                                         if(i < 0) {
                                             return "M-^" + (char)(i + 192);
                                         }
+
+                                        // タブ文字
+                                        if(optionsSet.contains(Options.DISPLAY_NON_PRINTING_AND_TAB)
+                                                && i == 0x09) {
+                                            return "^I";
+                                        }
+
                                         // それ以外
                                         return nonPrintingTable.getOrDefault(i, Character.toString((char)i));
                                     })
@@ -170,6 +181,9 @@ public class Main {
 
         @Parameter(names = "-u", description = "Disable output buffering.")
         private boolean u;
+
+        @Parameter(names = "-t", description = "Display non-printing characters, and display tab characters as `^I'.")
+        private boolean t;
     }
 }
 enum Options {
@@ -191,4 +205,9 @@ enum Options {
      * 非表示文字を表示する
      */
     DISPLAY_NON_PRINTING_CHARACTERS,
+
+    /**
+     * 非表示文字とタブ文字を表示する
+     */
+    DISPLAY_NON_PRINTING_AND_TAB,
 }

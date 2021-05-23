@@ -117,4 +117,17 @@ class MainTest {
         // run
         assertEquals(expected, Main.cat(file, DISPLAY_NON_PRINTING_CHARACTERS));
     }
+
+    @Test
+    void cat_displayNonPrintingCharAndTab(@TempDir Path tempDir) throws IOException {
+        // setup
+        var file = tempDir.resolve("test.txt");
+        Files.writeString(file, "aaa\t" + (char) 0x00);
+
+        var expected = "aaa^I^@";
+
+        // run
+        assertEquals(expected, Main.cat(file, DISPLAY_NON_PRINTING_CHARACTERS, DISPLAY_NON_PRINTING_AND_TAB));
+    }
+
 }
