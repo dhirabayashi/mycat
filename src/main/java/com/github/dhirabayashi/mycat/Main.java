@@ -74,7 +74,11 @@ public class Main {
         }
         if(argument.t) {
             options.add(Options.DISPLAY_NON_PRINTING_CHARACTERS);
-            options.add(Options.DISPLAY_NON_PRINTING_AND_TAB);
+            options.add(Options.DISPLAY_TAB);
+        }
+        if(argument.e) {
+            options.add(Options.DISPLAY_NON_PRINTING_CHARACTERS);
+            options.add(Options.DISPLAY_DOLLAR_EACH_END_OF_LINE);
         }
 
         // 終了コード
@@ -117,6 +121,11 @@ public class Main {
                 list = tmpList;
             }
 
+            var lineSeparator = "\n";
+            if(optionsSet.contains(Options.DISPLAY_DOLLAR_EACH_END_OF_LINE)) {
+                lineSeparator = "$\n";
+            }
+
             var counter = new Counter(0);
             return list.stream()
                     .map(line -> {
@@ -136,7 +145,7 @@ public class Main {
                                         }
 
                                         // タブ文字
-                                        if(optionsSet.contains(Options.DISPLAY_NON_PRINTING_AND_TAB)
+                                        if(optionsSet.contains(Options.DISPLAY_TAB)
                                                 && i == 0x09) {
                                             return "^I";
                                         }
@@ -159,7 +168,7 @@ public class Main {
 
                         return line;
                     })
-                    .collect(Collectors.joining("\n"));
+                    .collect(Collectors.joining(lineSeparator));
         }
     }
 
@@ -184,6 +193,9 @@ public class Main {
 
         @Parameter(names = "-t", description = "Display non-printing characters, and display tab characters as `^I'.")
         private boolean t;
+
+        @Parameter(names = "-e", description = "Display non-printing characters, and display a dollar sign (`$') at the end of each line.")
+        private boolean e;
     }
 }
 enum Options {
@@ -209,5 +221,10 @@ enum Options {
     /**
      * 非表示文字とタブ文字を表示する
      */
-    DISPLAY_NON_PRINTING_AND_TAB,
+    DISPLAY_TAB,
+
+    /**
+     * 非表示文字を表示し、各行の末尾に$をつける
+     */
+    DISPLAY_DOLLAR_EACH_END_OF_LINE
 }
