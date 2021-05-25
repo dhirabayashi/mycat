@@ -105,71 +105,77 @@ public class Main {
         var optionsSet = Arrays.stream(options)
                 .collect(Collectors.toSet());
 
-        try(var lines = Files.lines(path)) {
-            List<String> tmpList = lines.collect(Collectors.toList());
-            List<String> list = new ArrayList<>();
+        // メモリ使いまくりだけど、巨大なファイルを読み込むことは想定していないのでよいはず
+        var content = Files.readString(path);
 
-            if(optionsSet.contains(Options.SQUEEZE_EMPTY_LINES)) {
-                for(int i = 0; i < tmpList.size(); i++) {
-                    var line = tmpList.get(i);
-                    if(line.isEmpty() && i != (tmpList.size() - 1) && tmpList.get(i + 1).isEmpty()) {
-                        continue;
-                    }
-                    list.add(line);
+        List<String> tmpList = Arrays.stream(content.split("\n")).collect(Collectors.toList());
+        List<String> list = new ArrayList<>();
+
+        if(optionsSet.contains(Options.SQUEEZE_EMPTY_LINES)) {
+            for(int i = 0; i < tmpList.size(); i++) {
+                var line = tmpList.get(i);
+                if(line.isEmpty() && i != (tmpList.size() - 1) && tmpList.get(i + 1).isEmpty()) {
+                    continue;
                 }
-            } else {
-                list = tmpList;
+                list.add(line);
             }
-
-            var lineSeparator = "\n";
-            if(optionsSet.contains(Options.DISPLAY_DOLLAR_EACH_END_OF_LINE)) {
-                lineSeparator = "$\n";
-            }
-
-            var counter = new Counter(0);
-            return list.stream()
-                    .map(line -> {
-                        if(optionsSet.contains(Options.DISPLAY_NON_PRINTING_CHARACTERS)) {
-                            // Arrays.stream()にbyte[]を引数に取るものがないので、int[]に詰め替える
-                            var tmpBytes = line.getBytes(StandardCharsets.UTF_8);
-                            int[] bytes = new int[tmpBytes.length];
-                            for(int i = 0; i < bytes.length; i++) {
-                                bytes[i] = tmpBytes[i];
-                            }
-
-                            line = Arrays.stream(bytes)
-                                    .mapToObj(i -> {
-                                        // マルチバイト文字
-                                        if(i < 0) {
-                                            return "M-^" + (char)(i + 192);
-                                        }
-
-                                        // タブ文字
-                                        if(optionsSet.contains(Options.DISPLAY_TAB)
-                                                && i == 0x09) {
-                                            return "^I";
-                                        }
-
-                                        // それ以外
-                                        return nonPrintingTable.getOrDefault(i, Character.toString((char)i));
-                                    })
-                                    .collect(Collectors.joining());
-                        }
-
-                        if(optionsSet.contains(Options.NUMBER_LINES)) {
-                            counter.increment();
-                            return counter.intValue() + " " + line;
-                        }
-
-                        if(optionsSet.contains(Options.NUMBER_NON_BLANK_LINES) && !line.isEmpty()) {
-                            counter.increment();
-                            return counter.intValue() + " " + line;
-                        }
-
-                        return line;
-                    })
-                    .collect(Collectors.joining(lineSeparator));
+        } else {
+            list = tmpList;
         }
+
+        var lineSeparator = "\n";
+        if(optionsSet.contains(Options.DISPLAY_DOLLAR_EACH_END_OF_LINE)) {
+            lineSeparator = "$\n";
+        }
+
+        var counter = new Counter(0);
+        var ret = list.stream()
+                .map(line -> {
+                    if(optionsSet.contains(Options.DISPLAY_NON_PRINTING_CHARACTERS)) {
+                        // Arrays.stream()にbyte[]を引数に取るものがないので、int[]に詰め替える
+                        var tmpBytes = line.getBytes(StandardCharsets.UTF_8);
+                        int[] bytes = new int[tmpBytes.length];
+                        for(int i = 0; i < bytes.length; i++) {
+                            bytes[i] = tmpBytes[i];
+                        }
+
+                        line = Arrays.stream(bytes)
+                                .mapToObj(i -> {
+                                    // マルチバイト文字
+                                    if(i < 0) {
+                                        return "M-^" + (char)(i + 192);
+                                    }
+
+                                    // タブ文字
+                                    if(optionsSet.contains(Options.DISPLAY_TAB)
+                                            && i == 0x09) {
+                                        return "^I";
+                                    }
+
+                                    // それ以外
+                                    return nonPrintingTable.getOrDefault(i, Character.toString((char)i));
+                                })
+                                .collect(Collectors.joining());
+                    }
+
+                    if(optionsSet.contains(Options.NUMBER_LINES)) {
+                        counter.increment();
+                        return counter.intValue() + " " + line;
+                    }
+
+                    if(optionsSet.contains(Options.NUMBER_NON_BLANK_LINES) && !line.isEmpty()) {
+                        counter.increment();
+                        return counter.intValue() + " " + line;
+                    }
+
+                    return line;
+                })
+                .collect(Collectors.joining(lineSeparator));
+
+        if(content.endsWith("\n")) {
+            ret += lineSeparator;
+        }
+        return ret;
     }
 
     public static class Argument {

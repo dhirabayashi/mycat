@@ -134,9 +134,9 @@ class MainTest {
     void cat_displayDollarEndOfEachLine(@TempDir Path tempDir) throws IOException {
         // setup
         var file = tempDir.resolve("test.txt");
-        Files.writeString(file, "aaa\nbbb");
+        Files.writeString(file, "aaa\nbbb\n");
 
-        var expected = "aaa$\nbbb";
+        var expected = "aaa$\nbbb$\n";
 
         // run
         assertEquals(expected, Main.cat(file, DISPLAY_DOLLAR_EACH_END_OF_LINE));
